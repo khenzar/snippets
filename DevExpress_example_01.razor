@@ -1,0 +1,43 @@
+@inject IRepository VehicleRepository
+...
+	<DxDataGrid Data=@Vehicles >			
+		<DxDataGridCommandColumn Width="150px"></DxDataGridCommandColumn>
+		
+		<DxDataGridColumn Field=@nameof(Vehicle.Name) Caption="Name">
+		<DxDataGridComboBoxColumn Field=@nameof(Vehicle.Type) Caption="Vehicle Type" T="VehicleType" Data=@VehicleTypes></DxDataGridComboBoxColumn>		
+		<DxDataGridColumn Field=@nameof(Vehicle.Manufacturer) Caption="Manufacturer">
+			<DisplayTemplate>
+				@((context as Vehicle).Manufacturer)
+			</DisplayTemplate>
+			<EditTemplate>
+				@{
+					var vehicleType = _; // How to access the vehicle type that has been selected by the user?
+					var manufacturers = VehicleRepository.GetManufacturersForVehicleType(vehicleType); // query for a subset of large data
+				}
+				<DxComboBox Data=@manufacturers
+							SelectedItemChanged="@(newCellValue => ((CellEditContext)context).OnChanged(newCellValue))">
+				</DxComboBox>
+			</EditTemplate>
+		</DxDataGridColumn>
+	</DxDataGrid>
+
+@functions {
+	IEnumerable<Vehicle> Vehicles;
+	
+	protected override async Task OnInitAsync()
+	{
+		Vehicles = await VehicleRepository.GetAllVehicles();
+	}
+	...
+}
+
+public class Vehicle {
+	public string Name { get; set; }
+	public VehicleType Type { get; set; }
+	public string Manufacturer { get; set; }
+}
+public enum VehicleType {
+	Plane,
+	Car,
+	Bike
+}

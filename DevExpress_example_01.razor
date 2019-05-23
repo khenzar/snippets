@@ -23,7 +23,8 @@
 
 @functions {
 	IEnumerable<Vehicle> Vehicles;
-	
+	public IEnumerable<VehicleType> VehicleTypes => Enum.GetValues(typeof(VehicleType)).OfType<VehicleType>();
+		
 	protected override async Task OnInitAsync()
 	{
 		Vehicles = await VehicleRepository.GetAllVehicles();
